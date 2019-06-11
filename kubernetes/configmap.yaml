@@ -1,0 +1,179 @@
+apiVersion: v1
+data:
+  ehcache.xml: "<ehcache>\r\n\t<!--\r\n\t\tSets the path to the directory where cache
+    files are created.\r\n\r\n\t\tIf the path is a Java System Property it is replaced
+    by its value in the\r\n\t\trunning VM.\r\n\r\n\t\tThe following properties are
+    translated:\r\n\t\t* user.home - User's home directory\r\n\t\t* user.dir - User's
+    current working directory\r\n\t\t* java.io.tmpdir - Default temp file path\r\n\r\n\t\tSubdirectories
+    can be specified below the property e.g. java.io.tmpdir/one\r\n\t\t-->\r\n\t<diskStore
+    path=\"java.io.tmpdir/icellreport\"/>\r\n\t<cache name=\"org.hibernate.cache.StandardQueryCache\"\r\n\t\tmaxElementsInMemory=\"1000\"\r\n\t\teternal=\"true\"\r\n\t\ttimeToIdleSeconds=\"0\"\r\n\t\ttimeToLiveSeconds=\"0\"\r\n\t\toverflowToDisk=\"true\">\r\n\t</cache>\r\n\t<cache
+    name=\"org.hibernate.cache.UpdateTimestampsCache\"\r\n\t\tmaxElementsInMemory=\"1000\"\r\n\t\teternal=\"true\"\r\n\t\ttimeToIdleSeconds=\"0\"\r\n\t\ttimeToLiveSeconds=\"0\"\r\n\t\toverflowToDisk=\"false\">\r\n\t</cache>\r\n\t\r\n\t\r\n\t<!--分布式缓存RMI方式监听远程主机的${port}端口-->\r\n\t<cacheManagerPeerProviderFactory
+    class=\"net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory\"\r\n\t\tproperties=\"peerDiscovery=manual,rmiUrls=${rmiUrls}\"
+    />\r\n\t\r\n\t<!--以下配置是监听本机${port}端口-->\r\n\t<cacheManagerPeerListenerFactory class=\"net.sf.ehcache.distribution.RMICacheManagerPeerListenerFactory\"\r\n\t\tproperties=\"hostName=localhost,
+    port=${port},socketTimeoutMillis=2000\" />\r\n\t\r\n\t<!--用于数据同步的-->\r\n\t<cache
+    name=\"synchronousCache\"\r\n\t\tmaxElementsInMemory=\"1000\"\r\n\t\teternal=\"true\"\r\n\t\ttimeToIdleSeconds=\"0\"\r\n\t\ttimeToLiveSeconds=\"0\"\r\n\t\toverflowToDisk=\"true\"\r\n\t\tdiskPersistent=\"false\"\r\n\t\tdiskExpiryThreadIntervalSeconds=\"0\"
+    \r\n\t\tmemoryStoreEvictionPolicy=\"LFU\">\r\n\t\t<!--同步事件 replicatePuts=true
+    replicateRemovals=true 缓存同步监听-->\r\n\t\t<cacheEventListenerFactory class=\"net.sf.ehcache.distribution.RMICacheReplicatorFactory\"
+    \r\n\t\t\t   properties=\"replicateAsynchronously=true, replicatePuts=true, \r\n\t\t\t
+    \  replicateUpdates=true,replicateUpdatesViaCopy=false, replicateRemovals=true\"
+    />\r\n\t\t<!--本地监听动作 -->\t\t\t\t\t\t   \r\n\t\t<cacheEventListenerFactory class=\"com.dtsz.model.service.cache.ICellCacheEventListenerFactory\"
+    properties=\"bean=iCellCacheEventListener\"/>\r\n\t</cache>\r\n\t\r\n\t<!--模型缓存类，如cell,可以磁盘序列化-->\r\n\t<cache
+    name=\"modelCache\"\r\n\t\tmaxElementsInMemory=\"1000\"\r\n\t\teternal=\"true\"\r\n\t\ttimeToIdleSeconds=\"0\"\r\n\t\ttimeToLiveSeconds=\"0\"\r\n\t\toverflowToDisk=\"true\"\r\n\t\tdiskPersistent=\"false\"\r\n\t\tdiskExpiryThreadIntervalSeconds=\"0\"
+    \r\n\t\tmemoryStoreEvictionPolicy=\"LRU\">\r\n\t\t<!--同步事件  只监听replicateRemovals=true
+    有问题可能需要设置 replicateUpdates = true-->\r\n\t\t<cacheEventListenerFactory class=\"net.sf.ehcache.distribution.RMICacheReplicatorFactory\"\r\n\t\t\t
+    \  properties=\"replicateAsynchronously=true, replicatePuts=false,\r\n\t\t\t\treplicateUpdates=false,replicateUpdatesViaCopy=false,
+    replicateRemovals=true\" />\r\n\t</cache>\r\n\t\r\n\t<!--基本不会变化的系统相关缓存-->\r\n\t<cache
+    name=\"systemCache\"\r\n\t\tmaxElementsInMemory=\"1000\"\r\n\t\teternal=\"true\"\r\n\t\ttimeToIdleSeconds=\"0\"\r\n\t\ttimeToLiveSeconds=\"0\"\r\n\t\toverflowToDisk=\"true\"\r\n\t\tdiskPersistent=\"false\"\r\n\t\tdiskExpiryThreadIntervalSeconds=\"0\"
+    \r\n\t\tmemoryStoreEvictionPolicy=\"LFU\">\r\n\t\t<!--同步事件  只监听replicateRemovals=true
+    有问题可能需要设置 replicateUpdates = true-->\r\n\t\t<cacheEventListenerFactory class=\"net.sf.ehcache.distribution.RMICacheReplicatorFactory\"
+    \r\n\t\t\t   properties=\"replicateAsynchronously=true, replicatePuts=false, \r\n\t\t\t
+    \  replicateUpdates=false,replicateUpdatesViaCopy= false, replicateRemovals= true
+    \" />\r\n\t</cache>\r\n\t\r\n\t<!--基本不会变化的系统相关缓存-->\r\n\t<cache name=\"messageQueueCache\"\r\n\t\tmaxElementsInMemory=\"1000\"\r\n\t\teternal=\"true\"\r\n\t\ttimeToIdleSeconds=\"0\"\r\n\t\ttimeToLiveSeconds=\"0\"\r\n\t\toverflowToDisk=\"true\"\r\n\t\tdiskPersistent=\"false\"\r\n\t\tdiskExpiryThreadIntervalSeconds=\"0\"
+    \r\n\t\tmemoryStoreEvictionPolicy=\"LFU\">\r\n\t\t<!--同步事件  只监听replicateRemovals=true
+    有问题可能需要设置 replicateUpdates = true-->\r\n\t\t<cacheEventListenerFactory class=\"net.sf.ehcache.distribution.RMICacheReplicatorFactory\"
+    \r\n\t\t\t   properties=\"replicateAsynchronously=true, replicatePuts=false, \r\n\t\t\t
+    \  replicateUpdates=false,replicateUpdatesViaCopy= false, replicateRemovals= true
+    \" />\r\n\t</cache>\r\n\t\r\n\t<!--数据缓存，比如公式计算、分析表计算-->\r\n\t<cache name=\"dataCache\"\r\n\t\tmaxElementsInMemory=\"10000\"\r\n\t\teternal=\"true\"\r\n\t\ttimeToIdleSeconds=\"0\"\r\n\t\ttimeToLiveSeconds=\"0\"\r\n\t\toverflowToDisk=\"true\"\r\n\t\tdiskPersistent=\"false\"\r\n\t\tdiskExpiryThreadIntervalSeconds=\"0\"
+    \r\n\t\tmemoryStoreEvictionPolicy=\"LFU\">\r\n\t</cache>\r\n\t<!--日志缓存，比如系统日志、业务日志和异常日志-->\r\n\t<cache
+    name=\"logCache\"\r\n\t\tmaxElementsInMemory=\"10000\"\r\n\t\teternal=\"true\"\r\n\t\ttimeToIdleSeconds=\"0\"\r\n\t\ttimeToLiveSeconds=\"0\"\r\n\t\toverflowToDisk=\"true\"\r\n\t\tdiskPersistent=\"false\"\r\n\t\tdiskExpiryThreadIntervalSeconds=\"0\"
+    \r\n\t\tmemoryStoreEvictionPolicy=\"LFU\">\r\n\t</cache>\r\n\t\r\n\t<!--持久化Session，集群便于统一管理-->\r\n\t<cache
+    name=\"userSessionCache\"\r\n\t\tmaxElementsInMemory=\"1000\"\r\n\t\teternal=\"true\"\r\n\t\ttimeToIdleSeconds=\"0\"\r\n\t\ttimeToLiveSeconds=\"0\"\r\n\t\toverflowToDisk=\"true\"\r\n\t\tdiskPersistent=\"false\"\r\n\t\tdiskExpiryThreadIntervalSeconds=\"0\"
+    \r\n\t\tmemoryStoreEvictionPolicy=\"FIFO\">\r\n\t</cache>\r\n\t\r\n\t<!--\r\n\t\tSpecifies
+    a CacheManagerEventListenerFactory, be used to create a CacheManagerPeerProvider,\r\n\t\twhich
+    is notified when Caches are added or removed from the CacheManager.\r\n\r\n\t\tThe
+    attributes of CacheManagerEventListenerFactory are:\r\n\t\t* class - a fully qualified
+    factory class name\r\n\t\t* properties - comma separated properties having meaning
+    only to the factory.\r\n\r\n\t\tSets the fully qualified class name to be registered
+    as the CacheManager event listener.\r\n\r\n\t\tThe events include:\r\n\t\t* adding
+    a Cache\r\n\t\t* removing a Cache\r\n\r\n\t\tCallbacks to listener methods are
+    synchronous and unsynchronized. It is the responsibility\r\n\t\tof the implementer
+    to safely handle the potential performance and thread safety issues\r\n\t\tdepending
+    on what their listener is doing.\r\n\r\n\t\tIf no class is specified, no listener
+    is created. There is no default.\r\n\r\n\t\t<cacheManagerEventListenerFactory
+    class=\"\" properties=\"\"/>\r\n\t\t-->\r\n\t<!--\r\n\t\t(Enable for distributed
+    operation)\r\n\r\n\t\tSpecifies a CacheManagerPeerProviderFactory which will be
+    used to create a\r\n\t\tCacheManagerPeerProvider, which discovers other CacheManagers
+    in the cluster.\r\n\r\n\t\tThe attributes of cacheManagerPeerProviderFactory are:\r\n\t\t*
+    class - a fully qualified factory class name\r\n\t\t* properties - comma separated
+    properties having meaning only to the factory.\r\n\r\n\t\tEhcache comes with a
+    built-in RMI-based distribution system with two means of discovery of\r\n\t\tCacheManager
+    peers participating in the cluster:\r\n\t\t* automatic, using a multicast group.
+    This one automatically discovers peers and detects\r\n\t\t  changes such as peers
+    entering and leaving the group\r\n\t\t* manual, using manual rmiURL configuration.
+    A hardcoded list of peers is provided at\r\n\t\t  configuration time.\r\n\r\n\t\tConfiguring
+    Automatic Discovery:\r\n\t\tAutomatic discovery is configured as per the following
+    example:\r\n\t\t<cacheManagerPeerProviderFactory\r\n\t\t\t\t\t\t\tclass=\"net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory\"\r\n\t\t\t\t\t\t\tproperties=\"peerDiscovery=automatic,
+    multicastGroupAddress=230.0.0.1,\r\n\t\t\t\t\t\t\t\t\t\tmulticastGroupPort=4446\"/>\r\n\r\n\t\tValid
+    properties are:\r\n\t\t* peerDiscovery (mandatory) - specify \"automatic\"\r\n\t\t*
+    multicastGroupAddress (mandatory) - specify a valid multicast group address\r\n\t\t*
+    multicastGroupPort (mandatory) - specify a dedicated port for the multicast heartbeat\r\n\t\t
+    \ traffic\r\n\r\n\t\tConfiguring Manual Discovery:\r\n\t\tManual discovery is
+    configured as per the following example:\r\n\t\t<cacheManagerPeerProviderFactory
+    class=\r\n\t\t\t\t\t\t\t  \"net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory\"\r\n\t\t\t\t\t\t\t
+    \ properties=\"peerDiscovery=manual,\r\n\t\t\t\t\t\t\t  rmiUrls=//server1:40000/sampleCache1|//server2:40000/sampleCache1\r\n\t\t\t\t\t\t\t
+    \ | //server1:40000/sampleCache2|//server2:40000/sampleCache2\"/>\r\n\r\n\t\tValid
+    properties are:\r\n\t\t* peerDiscovery (mandatory) - specify \"manual\"\r\n\t\t*
+    rmiUrls (mandatory) - specify a pipe separated list of rmiUrls, in the form\r\n\t\t\t\t\t\t\t\t//hostname:port\r\n\r\n\t\tThe
+    hostname is the hostname of the remote CacheManager peer. The port is the listening\r\n\t\tport
+    of the RMICacheManagerPeerListener of the remote CacheManager peer.\r\n\r\n\t\tAn
+    alternate CacheManagerPeerProviderFactory can be used for JNDI discovery of other\r\n\t\tCacheManagers
+    in the cluster. Only manual discovery is supported.\r\n\r\n\t\tFor cacheManagerPeerProviderFactory
+    specify class\r\n\t\tnet.sf.ehcache.distribution.JNDIManualRMICacheManagerPeerProviderFactoryerFactory.\r\n\r\n\t\tCorrespondingly
+    for cacheManagerPeerListenerFactory specify class\r\n\t\tnet.sf.ehcache.distribution.JNDIRMICacheManagerPeerListenerFactoryory.\r\n\r\n\t\tConfiguring
+    JNDI Manual Discovery:\r\n\t\tManual JNDI discovery is configured as per the following
+    example:\r\n\t\t<cacheManagerPeerProviderFactory class=\r\n\t\t\t\"net.sf.ehcache.distribution.JNDIManualRMICacheManagerPeerProviderFactoryerFactory\"\r\n\t\t\tproperties=\"peerDiscovery=manual,
+    stashContexts=true, stashRemoteCachePeers=true,\r\n\t\t\t\t  jndiUrls=t3//server1:40000/sampleCache1|t3//server2:40000/sampleCache1\r\n\t\t\t\t
+    \ |t3//server1:40000/sampleCache2|t3//server2:40000/sampleCache2\"/>\r\n\r\n\t\tValid
+    properties are:\r\n\t\t* peerDiscovery (mandatory) - specify \"manual\"\r\n\t\t*
+    stashContexts (optional) - specify \"true\" or \"false\".  Defaults to true.\r\n\t\t
+    \ java.naming.Context objects are stashed for performance.\r\n\t\t* stashRemoteCachePeers
+    (optional) - specify \"true\" or \"false\".  Defaults to true.\r\n\t\t  CachePeer
+    objects are stashed for performance.\r\n\t\t* jndiUrls (mandatory) - specify a
+    pipe separated list of jndiUrls,\r\n\t\t  in the form protocol//hostname:port\r\n\r\n\t\t<cacheManagerPeerProviderFactory\r\n\t\t\t\tclass=\"net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory\"\r\n\t\t\t\tproperties=\"peerDiscovery=automatic,\r\n\t\t\t\t\t\t\tmulticastGroupAddress=230.0.0.1,\r\n\t\t\t\t\t\t\tmulticastGroupPort=4446\"/>\r\n\t\t-->\r\n\t<!--\r\n\t\t(Enable
+    for distributed operation)\r\n\r\n\t\tSpecifies a CacheManagerPeerListenerFactory
+    which will be used to create a\r\n\t\tCacheManagerPeerListener, which\r\n\t\tlistens
+    for messages from cache replicators participating in the cluster.\r\n\r\n\t\tThe
+    attributes of cacheManagerPeerListenerFactory are:\r\n\t\tclass - a fully qualified
+    factory class name\r\n\t\tproperties - comma separated properties having meaning
+    only to the factory.\r\n\r\n\t\tEhcache comes with a built-in RMI-based distribution
+    system. The listener component is\r\n\t\tRMICacheManagerPeerListener which is
+    configured using\r\n\t\tRMICacheManagerPeerListenerFactory. It is configured as
+    per the following example:\r\n\r\n\t\t<cacheManagerPeerListenerFactory\r\n\t\t\tclass=\"net.sf.ehcache.distribution.RMICacheManagerPeerListenerFactory\"\r\n\t\t\tproperties=\"hostName=fully_qualified_hostname_or_ip,\r\n\t\t\t\t\t\tport=${port},\r\n\t\t\t\t\t\tsocketTimeoutMillis=120000\"/>\r\n\r\n\t\tAll
+    properties are optional. They are:\r\n\t\t* hostName - the hostName of the host
+    the listener is running on. Specify\r\n\t\t  where the host is multihomed and
+    you want to control the interface over which cluster\r\n\t\t  messages are received.
+    Defaults to the host name of the default interface if not\r\n\t\t  specified.\r\n\t\t*
+    port - the port the listener listens on. This defaults to a free port if not specified.\r\n\t\t*
+    socketTimeoutMillis - the number of ms client sockets will stay open when sending\r\n\t\t
+    \ messages to the listener. This should be long enough for the slowest message.\r\n\t\t
+    \ If not specified it defaults 120000ms.\r\n\r\n\r\n\t\tAn alternate CacheManagerPeerListenerFactory
+    can be also be used for JNDI binding of\r\n\t\tlisteners for messages from cache
+    replicators participating in the cluster. For\r\n\t\tcacheManagerPeerListenerFactory
+    specify\r\n\t\tclass net.sf.ehcache.distribution.JNDIRMICacheManagerPeerListenerFactory.\r\n\t\tCorrespondingly
+    for cacheManagerPeerProviderFactory specify class\r\n\t\tnet.sf.ehcache.distribution.JNDIManualRMICacheManagerPeerProviderFactoryerFactory.\r\n\t\tProperties
+    for JNDIRMICacheManagerPeerListenerFactory are the same as\r\n\t\tRMICacheManagerPeerListenerFactory.\r\n\r\n\r\n\t\t<cacheManagerPeerListenerFactory\r\n\t\t\t\tclass=\"net.sf.ehcache.distribution.RMICacheManagerPeerListenerFactory\"/>\r\n\t\t-->\r\n\t<!--
+    Cache configuration.\r\n\r\n\t\tThe following attributes are required.\r\n\r\n\t\tname:\r\n\t\tSets
+    the name of the cache. This is used to identify the cache. It must be unique.\r\n\r\n\t\tmaxElementsInMemory:\r\n\t\tSets
+    the maximum number of objects that will be created in memory\r\n\r\n\t\teternal:\r\n\t\tSets
+    whether elements are eternal. If eternal,  timeouts are ignored and the\r\n\t\telement
+    is never expired.\r\n\r\n\t\toverflowToDisk:\r\n\t\tSets whether elements can
+    overflow to disk when the in-memory cache\r\n\t\thas reached the maxInMemory limit.\r\n\r\n\t\tThe
+    following attributes are optional.\r\n\r\n\t\ttimeToIdleSeconds:\r\n\t\tSets the
+    time to idle for an element before it expires.\r\n\t\ti.e. The maximum amount
+    of time between accesses before an element expires\r\n\t\tIs only used if the
+    element is not eternal.\r\n\t\tOptional attribute. A value of 0 means that an
+    Element can idle for infinity.\r\n\t\tThe default value is 0.\r\n\r\n\t\ttimeToLiveSeconds:\r\n\t\tSets
+    the time to live for an element before it expires.\r\n\t\ti.e. The maximum time
+    between creation time and when an element expires.\r\n\t\tIs only used if the
+    element is not eternal.\r\n\t\tOptional attribute. A value of 0 means that and
+    Element can live for infinity.\r\n\t\tThe default value is 0.\r\n\r\n\t\tdiskPersistent:\r\n\t\tWhether
+    the disk store persists between restarts of the Virtual Machine.\r\n\t\tThe default
+    value is false.\r\n\r\n\t\tdiskExpiryThreadIntervalSeconds:\r\n\t\tThe number
+    of seconds between runs of the disk expiry thread. The default value\r\n\t\tis
+    120 seconds.\r\n\r\n\t\tmemoryStoreEvictionPolicy:\r\n\t\tPolicy would be enforced
+    upon reaching the maxElementsInMemory limit. Default\r\n\t\tpolicy is Least Recently
+    Used (specified as LRU). Other policies available -\r\n\t\tFirst In First Out
+    (specified as FIFO) and Less Frequently Used\r\n\t\t(specified as LFU)\r\n\r\n\t\tCache
+    elements can also contain sub elements which take the same format of a factory
+    class\r\n\t\tand properties. Defined sub-elements are:\r\n\r\n\t\t* cacheEventListenerFactory
+    - Enables registration of listeners for cache events, such as\r\n\t\t  put, remove,
+    update, and expire.\r\n\r\n\t\t* bootstrapCacheLoaderFactory - Specifies a BootstrapCacheLoader,
+    which is called by a\r\n\t\t  cache on initialisation to prepopulate itself.\r\n\r\n\t\tEach
+    cache that will be distributed needs to set a cache event listener which replicates\r\n\t\tmessages
+    to the other CacheManager peers. For the built-in RMI implementation this is done\r\n\t\tby
+    adding a cacheEventListenerFactory element of type RMICacheReplicatorFactory to
+    each\r\n\t\tdistributed cache's configuration as per the following example:\r\n\r\n\t\t<cacheEventListenerFactory
+    class=\"net.sf.ehcache.distribution.RMICacheReplicatorFactory\"\r\n\t\t\t properties=\"replicateAsynchronously=true,\r\n\t\t\t
+    replicatePuts=true,\r\n\t\t\t replicateUpdates=true,\r\n\t\t\t replicateUpdatesViaCopy=true,\r\n\t\t\t
+    replicateRemovals=true \"/>\r\n\r\n\t\tThe RMICacheReplicatorFactory recognises
+    the following properties:\r\n\r\n\t\t* replicatePuts=true|false - whether new
+    elements placed in a cache are\r\n\t\t  replicated to others. Defaults to true.\r\n\r\n\t\t*
+    replicateUpdates=true|false - whether new elements which override an\r\n\t\t  element
+    already existing with the same key are replicated. Defaults to true.\r\n\r\n\t\t*
+    replicateRemovals=true - whether element removals are replicated. Defaults to
+    true.\r\n\r\n\t\t* replicateAsynchronously=true | false - whether replications
+    are\r\n\t\t  asynchronous (true) or synchronous (false). Defaults to true.\r\n\r\n\t\t*
+    replicateUpdatesViaCopy=true | false - whether the new elements are\r\n\t\t  copied
+    to other caches (true), or whether a remove message is sent. Defaults to true.\r\n\r\n\r\n\t\t*
+    asynchronousReplicationIntervalMillis=<number of milliseconds> - The asynchronous\r\n\t\t
+    \ replicator runs at a set interval of milliseconds. The default is 1000. The
+    minimum\r\n\t\t  is 10. This property is only applicable if replicateAsynchronously=true\r\n\r\n\r\n\t\tThe
+    RMIBootstrapCacheLoader bootstraps caches in clusters where RMICacheReplicators
+    are\r\n\t\tused. It is configured as per the following example:\r\n\r\n\t\t<bootstrapCacheLoaderFactory\r\n\t\t\tclass=\"net.sf.ehcache.distribution.RMIBootstrapCacheLoaderFactory\"\r\n\t\t\tproperties=\"bootstrapAsynchronously=true,
+    maximumChunkSizeBytes=5000000\"/>\r\n\r\n\t\tThe RMIBootstrapCacheLoaderFactory
+    recognises the following optional properties:\r\n\r\n\t\t* bootstrapAsynchronously=true|false
+    - whether the bootstrap happens in the background\r\n\t\t  after the cache has
+    started. If false, bootstrapping must complete before the cache is\r\n\t\t  made
+    available. The default value is true.\r\n\r\n\t\t* maximumChunkSizeBytes=<integer>
+    - Caches can potentially be very large, larger than the\r\n\t\t  memory limits
+    of the VM. This property allows the bootstraper to fetched elements in\r\n\t\t
+    \ chunks. The default chunk size is 5000000 (5MB).\r\n\r\n\t\t-->\r\n\t<!--\r\n\t\tMandatory
+    Default Cache configuration. These settings will be applied to caches\r\n\t\tcreated
+    programmtically using CacheManager.add(String cacheName)\r\n\t\t-->\r\n\t<defaultCache\r\n\t\tmaxElementsInMemory=\"1000\"\r\n\t\teternal=\"true\"\r\n\t\ttimeToIdleSeconds=\"0\"\r\n\t\ttimeToLiveSeconds=\"0\"\r\n\t\toverflowToDisk=\"true\"\r\n\t\tdiskPersistent=\"false\"\r\n\t\tdiskExpiryThreadIntervalSeconds=\"0\"
+    \r\n\t\tmemoryStoreEvictionPolicy=\"LRU\">\r\n\t</defaultCache>\r\n</ehcache>"
+kind: ConfigMap
+metadata:
+  name: ${configMapName}
+  namespace: default
+  annotations:
+    port: "${port}"

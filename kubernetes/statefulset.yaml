@@ -1,0 +1,59 @@
+apiVersion: apps/v1beta2
+kind: StatefulSet
+metadata:
+  name: ${statefulSetName}
+spec:
+  selector:
+    matchLabels:
+      service: ${serviceName}
+  serviceName: "${serviceName}"
+  replicas: ${replicas}
+  template:
+    metadata:
+      labels:
+        service: ${serviceName}
+    spec:
+      initContainers:
+      - image: ${initImage}
+        name: coptwar-init
+        command: ${command}
+        volumeMounts:
+        - mountPath: /app
+          name: app-volume
+      containers:
+      - image: ${image}
+        name: ${statefulSetName}-run
+        command: ["catalina.sh", "run"]
+        #env:
+        #- name: CATALINA_OPTS
+        #  value: "-Xms256m -Xmx512m -XX:MetaspaceSize:128m -XX:MaxMetaspaceSize=256m"
+        volumeMounts:
+        - mountPath: /usr/local/tomcat/webapps
+          name: app-volume
+        - mountPath: /usr/local/tomcat/webapps/${contextName}/WEB-INF/classes/ehcache.xml
+          subPath: ehcache.xml
+          name: ${configMapName}
+        livenessProbe:
+          httpGet:
+            path: ${livePath}
+            port: 8080
+          initialDelaySeconds: 90
+          periodSeconds: 60
+          timeoutSeconds: 5
+          failureThreshold: 3
+        ports:
+        - containerPort: 8080
+          #hostPort: 8080
+        resources:
+          limits:
+            memory: "${memory}Mi"
+            cpu: "${cpu}"
+      volumes:
+      - name: app-volume
+        emptyDir: {}
+      - name: ${configMapName}
+        configMap:
+          name: ${configMapName}
+          items:
+          - key: ehcache.xml
+            path: ehcache.xml
